@@ -65,7 +65,7 @@ defmodule Client do
   def handle_info({:livetweet, user_id, text}, [id, numTweets, myTweets, iSubscribed]) do
     IO.puts "Received live tweet from the user #{user_id}, the tweet said #{inspect(text)}"
     updateTweets = myTweets ++ [{user_id, text}]
-  {:noreply, [id, numTweets, myTweets, iSubscribed]}
+  {:noreply, [id, numTweets, updateTweets, iSubscribed]}
   end
 
   def handle_cast(:selectYourFavorites, [id, numTweets, myTweets, iSubscribed]) do
@@ -88,6 +88,15 @@ defmodule Client do
 
   def handle_cast(:doSomeMentions, [id, numTweets, myTweets, iSubscribed]) do
      mentions_task = Task.start(fn -> doSomeMentions(id, 10) end)
+     {:noreply, [id, numTweets, myTweets, iSubscribed]}
+  end
+
+  def handle_cast(:retweet, [id, numTweets, myTweets, iSubscribed]) do
+     retweets = Enum.shuffle(myTweets) |> Enum.slice(1..10)
+     IO.inspect retweets
+     msgs = Enum.map(retweets, fn x -> "Retweeting the tweet from "<> (elem(x,0) |> Integer.to_string()) <> " : " <> elem(x,1)  end)
+     IO.inspect Enum.at(msgs, 0)
+     for msg <- msgs, do: tweet(id, msg)
      {:noreply, [id, numTweets, myTweets, iSubscribed]}
   end
 
