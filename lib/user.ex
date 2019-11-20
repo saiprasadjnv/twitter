@@ -11,7 +11,7 @@ defmodule Client do
     Process.sleep(20)
     register(id)
     login(id)
-    tweeting = Task.start(fn -> sendTweets(id, numTweets) end)
+    tweet = Task.start(fn -> tweeting(id, numTweets) end)
     {:ok, [id, numTweets, myTweets, iSubscribed]}
   end
 
@@ -29,7 +29,7 @@ defmodule Client do
   end
 
   def handle_info({:livetweet, user_id, text}, [id, numTweets, myTweets, iSubscribed]) do
-    updateTweets = myTweets ++ [{tweet_id, user_id, text}]
+    updateTweets = myTweets ++ [{user_id, text}]
   {:noreply, [id, numTweets, myTweets, iSubscribed]}
   end
 

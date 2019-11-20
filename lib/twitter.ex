@@ -36,7 +36,7 @@ defmodule Twitter do
           send(pid, {:livetweet, user_id, text})
         end
      end
-     mysubscibers = :ets.lookup_element(:subscribers, user_id, 2)
+     mysubscribers = :ets.lookup_element(:subscribers, user_id, 2)
      agent = :global.whereis_name(:activeUsers)
      for i <- mysubscribers do
          if ActiveUsers.isAlive(agent, i), do: send(i, {:livetweet, user_id, text})

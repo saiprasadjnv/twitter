@@ -47,7 +47,7 @@ defmodule Services do
 
    defp checkForHashtags(text) do
       words = String.split(text, [" ", "&", "/"])
-      hashes = Enum.filter(words, fn x -> String.at(x,1)=="#")
+      hashes = Enum.filter(words, fn x -> String.at(x,1)=="#" end)
       a = if length(hashes) == 0 do
               0
             else
@@ -58,7 +58,7 @@ defmodule Services do
 
    defp checkForMentions(text) do
       words = String.split(text, [" ", "&", "/"])
-      mentions = Enum.filter(words, fn x -> String.at(x,1)=="@")
+      mentions = Enum.filter(words, fn x -> String.at(x,1)=="@" end)
       mentions = Enum.map(mentions, fn x -> String.to_integer(x) end)
       a = if length(mentions) == 0 do
               0
