@@ -53,6 +53,7 @@ defmodule Services do
       a = if length(hashes) == 0 do
               0
             else
+              IO.puts "Hashes identified #{inspect(hashes)}"
               hashes
           end
       a
@@ -60,15 +61,15 @@ defmodule Services do
 
    defp checkForMentions(text) do
       words = String.split(text, [" ", "&", "/"])
-      IO.inspect words
+      #IO.inspect words
       mentions = Enum.filter(words, fn x -> String.at(x,0)=="@" end)
       mentions = Enum.map(mentions, fn x -> String.slice(x,1..-1) |> String.to_integer() end)
       #mentions = Enum.map(mentions, fn x -> String.to_integer(x) end)
-      IO.puts "Mentions identified #{inspect(mentions)}"
+      #IO.puts "Mentions identified #{inspect(mentions)}"
       a = if length(mentions) == 0 do
               0
             else
-              IO.inspect mentions
+              IO.puts  "mentions identified #{inspect(mentions)}"
               mentions
           end
       a

@@ -1,3 +1,5 @@
+## This agent maintains the list of active users
+
 defmodule ActiveUsers do
   use Agent
   def start_link(initial_value) do

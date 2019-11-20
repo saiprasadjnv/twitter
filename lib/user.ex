@@ -1,3 +1,5 @@
+### This program simulates the end user
+
 defmodule Client do
   use GenServer, restart: :temporary, timeout: 10000
   import Services
@@ -35,9 +37,16 @@ defmodule Client do
       ilikeHashes = ilikeHashes ++ (if rem(id,10) == 0 , do: ["#IendWithZero"], else: [])
       ilikeHashes = ilikeHashes ++ (if :math.sqrt(id) - (:math.sqrt(id) |> floor) == 0.0 , do: ["#ImPerfect"], else: [])
       tweets = for hash <- ilikeHashes, do: GenServer.call(twitter, {:sendHashedTweets, hash, id})
-      len = length(tweets)
+      len = List.flatten(tweets) |> length()
       IO.puts "I (#{id}) like #{len} tweets that have hashTags :)"
      {:noreply, [id, numTweets, myTweets ++ tweets, iSubscribed]}
+  end
+
+  def handle_cast(:deleteAccount, [id, numTweets, myTweets, iSubscribed]) do
+    twitter = :global.whereis_name(:twitter)
+    send(twitter, {:delete_account, id})
+    logout(id)
+    {:noreply, [id, numTweets, myTweets, iSubscribed]}
   end
 
   def handle_info(:register, [id, numTweets, myTweets, iSubscribed]) do

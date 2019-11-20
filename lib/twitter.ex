@@ -96,8 +96,10 @@ defmodule Twitter do
     {:noreply, []}
    end
 
-   def handle_info({:delete_account, user_id}) do
+   def handle_info({:delete_account, user_id},[]) do
        :ets.delete(:users, user_id)
+       :ets.delete(:tweets, user_id)
+       :ets.delete(:mentions, user_id)
     {:noreply, []}
    end
 
