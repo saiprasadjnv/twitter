@@ -39,7 +39,7 @@ defmodule Client do
   {:noreply, [id, numTweets, myTweets, iSubscribed]}
   end
 
-  def handle_cast(:selectYourFavorites, [id, numTweets, myTweets, iSuscribed]) do
+  def handle_cast(:selectYourFavorites, [id, numTweets, myTweets, iSubscribed]) do
     agent = :global.whereis_name(:activeUsers)
      aliveUsers =  ActiveUsers.getUsers(agent)
      numFavs = :rand.uniform(length(aliveUsers))
@@ -48,6 +48,15 @@ defmodule Client do
      for fav <-myFavs, do: send(twitter, {:subscribe, id, fav})
     {:noreply, [id, numTweets, myTweets, myFavs]}
   end
+
+
+  def handle_cast(:queryAllYourTweets, [id, numTweets, myTweets, iSubscribed]) do
+     twitter = :global.whereis_name(:twitter)
+     mytweets = GenServer.call(twitter, {:sendAllMyTweets, id, iSubscribed})
+     if mytweets != [], do: IO.puts "I queried and received all my tweets"
+     {:noreply, [id, numTweets, myTweets, iSubscribed]}
+  end
+
 
   def tweeting(id, numTweets) when numTweets != 0 do
       msg = "I will be posting #{numTweets-1} more tweets"

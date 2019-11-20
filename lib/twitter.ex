@@ -16,6 +16,20 @@ defmodule Twitter do
     {:ok, []}
    end
 
+   def handle_call({:sendAllMyTweets, user_id, iSubscribed}, from, []) do
+     mentioned_tweets = :ets.lookup_element(:mentions, user_id, 2)
+     user_tweets = :ets.lookup_element(:tweets, user_id, 2)
+     subscribed_tweets = getAllSubscribedTweets(self(), iSubscribed)
+     tweets = mentioned_tweets ++ user_tweets ++ subscribed_tweets
+     {:reply, tweets, [], :infinity}
+   end
+
+   #def handle_call({:tweets, user_id}, from, []) do
+    # tweets = :ets.lookup_element(:tweets, user_id, 2)
+     #{:reply, tweets, [], :infinity}
+  # end
+
+
    def handle_info({:register, user_id, user_info}, state) do
       IO.puts "Registered user #{user_id}, #{inspect(user_info)}"
       :ets.insert(:users, {user_id, user_info})
@@ -24,11 +38,6 @@ defmodule Twitter do
       :ets.insert(:subscribers, {user_id, []})
       {:noreply, state}
    end
-
-   #def handle_call({:get_tweets, user_id, myFavUsers}) do
-
-    #{:reply, tweets, [], :infinity}
-   #end
 
    def handle_info({:deliver_tweet, user_id, text, mentions}, []) do
      if mentions != 0 do
@@ -79,5 +88,18 @@ defmodule Twitter do
        :ets.delete(:users, user_id)
     {:noreply, []}
    end
+
+
+  def getAllSubscribedTweets(twitter, users) when users == [] do
+     []
+  end
+
+  def getAllSubscribedTweets(twitter, users) when users != [] do
+     last_user = Enum.at(users,-1)
+     #last_user_tweets = GenServer.call(twitter, {:tweets, last_user})
+     last_user_tweets = :ets.lookup_element(:tweets, last_user, 2)
+     last_user_tweets ++ getAllSubscribedTweets(twitter, users -- [last_user])
+  end
+
 
 end

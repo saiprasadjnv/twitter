@@ -9,6 +9,9 @@ defmodule Project4 do
     for pid <- users, do: spawn(fn -> GenServer.cast(pid, :selectYourFavorites) end) |> Process.monitor()
     Process.sleep(100)
     for pid <- users, do: spawn(fn -> GenServer.cast(pid, :startTweeting) end) |> Process.monitor()
+    Process.sleep(999)
+    for pid <- users, do: spawn(fn -> GenServer.cast(pid, :queryAllYourTweets) end) |> Process.monitor()
+    Process.sleep(3000)
     waitUntilFinish(agent)
   end
 
