@@ -21,10 +21,11 @@ defmodule Twitter do
       :ets.insert(:users, {user_id, user_info})
       :ets.insert(:tweets, {user_id, []})
       :ets.insert(:mentions, {user_id, []})
+      :ets.insert(:subscribers, {user_id, []})
       {:noreply, state}
    end
 
-   #def handle_call({:get_tweets, user_ids}) do
+   #def handle_call({:get_tweets, user_id, myFavUsers}) do
 
     #{:reply, tweets, [], :infinity}
    #end
@@ -33,21 +34,22 @@ defmodule Twitter do
      if mentions != 0 do
         for i <- mentions do
           pid = :global.whereis_name(i)
+          #IO.puts "Sending live tweets to the user #{inspect(pid)}"
           send(pid, {:livetweet, user_id, text})
         end
      end
      mysubscribers = :ets.lookup_element(:subscribers, user_id, 2)
      agent = :global.whereis_name(:activeUsers)
      for i <- mysubscribers do
-         if ActiveUsers.isAlive(agent, i), do: send(i, {:livetweet, user_id, text})
+         if ActiveUsers.isAlive(agent, i), do: :global.whereis_name(i) |> send({:livetweet, user_id, text})
      end
      {:noreply, []}
    end
 
    def handle_info({:tweet, user_id, text}, []) do
-    tweetID = user_id * 1000 + (for i<- 1..999, do: i) |> Enum.random()
+    tweetID = user_id * 1000 + ((for i<- 1..999, do: i) |> Enum.random())
     addTweet = :ets.lookup_element(:tweets, user_id, 2) ++ [{tweetID, text}]
-    :ets.update(:tweets, user_id, {2, addTweet})
+    :ets.update_element(:tweets, user_id, {2, addTweet})
    {:noreply, []}
    end
 
@@ -67,7 +69,7 @@ defmodule Twitter do
    {:noreply, []}
    end
 
-   def handle_info({:subscribe, user_id, subscribed_id}) do
+   def handle_info({:subscribe, user_id, subscribed_id}, []) do
        addNewSubscriber = :ets.lookup_element(:subscribers, subscribed_id, 2) ++ [user_id]
        :ets.update_element(:subscribers, subscribed_id, {2, addNewSubscriber})
     {:noreply, []}

@@ -4,6 +4,9 @@ defmodule ActiveUsers do
     Agent.start_link(fn -> initial_value end, name: {:global, :activeUsers})
   end
 
+  def isAlive(pid, user_id) do
+    Agent.get(pid, fn state -> user_id in state end, :infinity)
+  end
 
   def addUser(pid, user_id) do
     Agent.update(pid, fn state -> state ++ [user_id] end, :infinity)
@@ -11,6 +14,10 @@ defmodule ActiveUsers do
 
   def deleteUser(pid,user_id) do
     Agent.update(pid, fn state -> state -- [user_id] end, :infinity)
+  end
+
+  def getUsers(pid) do
+    Agent.get(pid, fn state -> state end, :infinity)
   end
 
   def numUsersAlive(pid) do

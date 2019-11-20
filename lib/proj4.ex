@@ -3,10 +3,12 @@ defmodule Project4 do
   def start_project(numUsers, numTweets) do
     {:ok, agent} = ActiveUsers.start_link([])
     {:ok, twitter} = Twitter.start_link([])
-    {:ok, _supervisor} = TwitterSupervisor.start_link([numUsers, numTweets])
+    {:ok, supervisor} = TwitterSupervisor.start_link([numUsers, numTweets])
+    Process.sleep(10)
+    users = Supervisor.which_children(supervisor)|> Enum.map(fn {_,c,_,_}-> c end)
+    for pid <- users, do: spawn(fn -> GenServer.cast(pid, :selectYourFavorites) end) |> Process.monitor()
     Process.sleep(100)
-    #testQueryTweets(agent)
-    Process.sleep(50)
+    for pid <- users, do: spawn(fn -> GenServer.cast(pid, :startTweeting) end) |> Process.monitor()
     waitUntilFinish(agent)
   end
 
