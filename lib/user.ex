@@ -57,6 +57,10 @@ defmodule Client do
      {:noreply, [id, numTweets, myTweets, iSubscribed]}
   end
 
+  def handle_cast(:doSomeMentions, [id, numTweets, myTweets, iSubscribed]) do
+     mentions_task = Task.start(fn -> doSomeMentions(id, 10) end)
+     {:noreply, [id, numTweets, myTweets, iSubscribed]}
+  end
 
   def tweeting(id, numTweets) when numTweets != 0 do
       msg = "I will be posting #{numTweets-1} more tweets"
@@ -68,6 +72,19 @@ defmodule Client do
  def tweeting(id, numTweets) when numTweets == 0 do
     Process.sleep(100)
     :done
+ end
+
+ def doSomeMentions(id, num) when num == 0 do
+    :done
+ end
+
+ def doSomeMentions(id, num) when num !=0 do
+  agent = :global.whereis_name(:activeUsers)
+  randomuser = ActiveUsers.getArandomUser(agent, id)
+  msg = "@#{randomuser} I mentioned you in my tweet Tom#{randomuser}"
+  tweet(id, msg)
+  Process.sleep(5)
+  doSomeMentions(id, num-1)
  end
 
 end

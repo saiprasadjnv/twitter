@@ -28,4 +28,7 @@ defmodule ActiveUsers do
     Agent.get(pid, fn state -> Enum.random(state) end, :infinity)
   end
 
+  def getArandomUser(pid, id) do
+    Agent.get(pid, fn state -> Enum.random(state -- [id]) end, :infinity)
+  end
 end
