@@ -16,8 +16,28 @@ defmodule Client do
   end
 
   def handle_cast(:startTweeting, [id, numTweets, myTweets, iSubscribed]) do
-    tweet = Task.start(fn -> tweeting(id, numTweets) end)
+    tweets = Task.start(fn -> tweeting(id, numTweets) end)
     {:noreply, [id, numTweets, myTweets, iSubscribed]}
+  end
+
+  def handle_cast(:getMentions,[id, numTweets, myTweets, iSubscribed]) do
+     twitter = :global.whereis_name(:twitter)
+     tweets = GenServer.call(twitter, {:sendMentionedTweets,id})
+     len = length(tweets)
+     IO.puts "I (#{id}) am mentioned in #{len} tweets :)"
+     {:noreply, [id, numTweets, myTweets ++ tweets, iSubscribed]}
+  end
+
+  def handle_cast(:getSomehashes, [id, numTweets, myTweets, iSubscribed]) do
+     twitter = :global.whereis_name(:twitter)
+      ilikeHashes = []
+      ilikeHashes = ilikeHashes ++ (if rem(id, 2) !=0 , do: ["#Imeven"], else: ["#ImOdd"])
+      ilikeHashes = ilikeHashes ++ (if rem(id,10) == 0 , do: ["#IendWithZero"], else: [])
+      ilikeHashes = ilikeHashes ++ (if :math.sqrt(id) - (:math.sqrt(id) |> floor) == 0.0 , do: ["#ImPerfect"], else: [])
+      tweets = for hash <- ilikeHashes, do: GenServer.call(twitter, {:sendHashedTweets, hash, id})
+      len = length(tweets)
+      IO.puts "I (#{id}) like #{len} tweets that have hashes :)"
+     {:noreply, [id, numTweets, myTweets ++ tweets, iSubscribed]}
   end
 
   def handle_info(:register, [id, numTweets, myTweets, iSubscribed]) do

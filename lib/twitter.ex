@@ -30,6 +30,16 @@ defmodule Twitter do
   # end
 
 
+   def handle_call({:sendHashedTweets, hash, user_id}, from , []) do
+    tweets = :ets.lookup_element(:hashTags, hash, 2)
+    {:reply, tweets, [], :infinity}
+   end
+
+   def handle_call({:sendMentionedTweets, user_id}, from , []) do
+    tweets = :ets.lookup_element(:mentions, user_id, 2)
+    {:reply, tweets, [], :infinity}
+   end
+
    def handle_info({:register, user_id, user_info}, state) do
       IO.puts "Registered user #{user_id}, #{inspect(user_info)}"
       :ets.insert(:users, {user_id, user_info})
