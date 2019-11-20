@@ -36,7 +36,7 @@ defmodule Client do
       ilikeHashes = ilikeHashes ++ (if :math.sqrt(id) - (:math.sqrt(id) |> floor) == 0.0 , do: ["#ImPerfect"], else: [])
       tweets = for hash <- ilikeHashes, do: GenServer.call(twitter, {:sendHashedTweets, hash, id})
       len = length(tweets)
-      IO.puts "I (#{id}) like #{len} tweets that have hashes :)"
+      IO.puts "I (#{id}) like #{len} tweets that have hashTags :)"
      {:noreply, [id, numTweets, myTweets ++ tweets, iSubscribed]}
   end
 
