@@ -63,16 +63,18 @@ defmodule Twitter do
    end
 
    def handle_info({:hashTag, hash, user_id, text}, []) do
-      if :ets.member(:hashTag, hash) do
-         addTweet = :ets.lookup_element(:hashTag, hash, 2) ++ [{user_id, text}]
-         :ets.update_element(:hashTag, hash, {2, addTweet})
+      if :ets.member(:hashTags, hash) do
+         IO.puts "Received a hash tag tweet from #{user_id}"
+         addTweet = :ets.lookup_element(:hashTags, hash, 2) ++ [{user_id, text}]
+         :ets.update_element(:hashTags, hash, {2, addTweet})
          else
-           :ets.insert(:hashTag, {hash, [{user_id, text}]})
+           :ets.insert(:hashTags, {hash, [{user_id, text}]})
       end
    {:noreply, []}
    end
 
    def handle_info({:mention, mention, user_id, text}, []) do
+     IO.puts "I received a mention tweet from #{user_id}"
      addTweet = :ets.lookup_element(:mentions, mention, 2) ++ [{user_id, text}]
      :ets.update_element(:mentions, mention, {2, addTweet})
    {:noreply, []}

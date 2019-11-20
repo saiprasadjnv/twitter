@@ -62,6 +62,25 @@ defmodule Client do
      {:noreply, [id, numTweets, myTweets, iSubscribed]}
   end
 
+  def handle_cast(:hashTagTweets, [id, numTweets, myTweets, iSubscribed]) do
+     if rem(id,2) == 0 do
+        msg = "#Imeven I am even cuz my id is #{id}"
+        tweet(id, msg)
+      else
+        msg = "#ImOdd I am odd cuz my id is #{id}"
+        tweet(id,msg)
+      end
+    if rem(id,10) == 0 do
+      msg = "#IendWithZero My id ends with zero :) #{id}"
+      tweet(id, msg)
+    end
+    if :math.sqrt(id) - (:math.sqrt(id) |> floor) == 0.0 do
+      msg = "#ImPerfect I am perfect cuz my ID is a perfect square #{id}"
+      tweet(id, msg)
+    end
+     {:noreply, [id, numTweets, myTweets, iSubscribed]}
+  end
+
   def tweeting(id, numTweets) when numTweets != 0 do
       msg = "I will be posting #{numTweets-1} more tweets"
       tweet(id, msg)
