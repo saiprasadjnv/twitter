@@ -47,7 +47,7 @@ defmodule Services do
 
    defp checkForHashtags(text) do
       words = String.split(text, [" ", "&", "/"])
-      IO.inspect words
+      #IO.inspect words
       hashes = Enum.filter(words, fn x -> String.at(x,0)=="#" end)
       #IO.puts "HashTags identified #{inspect(hashes)}"
       a = if length(hashes) == 0 do

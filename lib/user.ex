@@ -138,7 +138,7 @@ defmodule Client do
  def doSomeMentions(id, num) when num !=0 do
   agent = :global.whereis_name(:activeUsers)
   randomuser = ActiveUsers.getArandomUser(agent, id)
-  msg = "@#{randomuser} I mentioned you in my tweet Tom#{randomuser}"
+  msg = "@#{randomuser} :  I mentioned you in my tweet Tom#{randomuser}"
   tweet(id, msg)
   Process.sleep(5)
   doSomeMentions(id, num-1)
